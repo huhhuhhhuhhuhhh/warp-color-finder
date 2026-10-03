@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warp Color Finder</title>
+  <meta name="description" content="Pick colors from any image. Copy HEX, RGB, HSL and download palettes. Open source by Warp Projects." />
+  <link rel="icon" href="./logo.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <span class="brand-logo"><img src="./logo.png" alt="Warp Projects logo" onerror="this.remove()" /></span>
+        <span class="brand-text">WARP <em>Color Finder</em></span>
+        <span class="badge">OPEN SOURCE</span>
+      </div>
+      <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">
+        <svg id="iconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+        </svg>
+        <svg id="iconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1>Find colors from any image</h1>
+      <p>Upload, click to pick, copy the code and download the palette.</p>
+      <ol class="steps">
+        <li><strong>01</strong> Upload</li>
+        <li><strong>02</strong> Pick</li>
+        <li><strong>03</strong> Copy / Download</li>
+      </ol>
+    </section>
+
+    <section id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload image">
+      <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+      <div class="drop-inner">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
+        <strong>Drop your image here</strong>
+        <span>or click to browse — PNG / JPG / WEBP</span>
+      </div>
+    </section>
+
+    <section id="editor" class="editor" hidden>
+      <div class="editor-grid">
+        <div class="canvas-card">
+          <div class="card-head">
+            <span id="fileName">Image</span>
+            <span class="hint">Hover to zoom, click to pick</span>
+          </div>
+          <canvas id="canvas"></canvas>
+          <div class="toolbar">
+            <button id="pickBtn" class="btn" type="button">Pick from image</button>
+            <button id="resetBtn" class="btn ghost" type="button">New image</button>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="picked">
+            <div id="swatch" class="swatch"></div>
+            <div class="picked-meta">
+              <div id="hexBig" class="hex-big">#000000</div>
+              <div id="rgbSmall" class="muted">rgb(0, 0, 0)</div>
+            </div>
+            <div id="loupe" class="loupe" aria-hidden="true"><canvas id="loupeCanvas" width="96" height="96"></canvas></div>
+          </div>
+
+          <div class="codes">
+            <div class="code-row">
+              <span class="label">HEX</span>
+              <code id="valHex">#000000</code>
+              <button class="copy" data-copy="valHex" type="button">Copy</button>
+            </div>
+            <div class="code-row">
+              <span class="label">RGB</span>
+              <code id="valRgb">rgb(0, 0, 0)</code>
+              <button class="copy" data-copy="valRgb" type="button">Copy</button>
+            </div>
+            <div class="code-row">
+              <span class="label">HSL</span>
+              <code id="valHsl">hsl(0, 0%, 0%)</code>
+              <button class="copy" data-copy="valHsl" type="button">Copy</button>
+            </div>
+          </div>
+
+          <div class="pal-block">
+            <h2>Base + close tones</h2>
+            <div id="nearRow" class="sw-row"></div>
+          </div>
+
+          <div class="pal-block">
+            <h2>Harmonies</h2>
+            <div id="harmRow" class="sw-row"></div>
+          </div>
+
+          <div class="dl-row">
+            <button id="dlCss" class="btn" type="button">Download CSS</button>
+            <button id="dlTxt" class="btn ghost" type="button">TXT</button>
+            <button id="dlPng" class="btn ghost" type="button">PNG</button>
+          </div>
+          <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>© Warp Projects — Open source. Free to use as you like.</span>
+      <span>Click any code to copy.</span>
+    </footer>
+  </main>
+
+  <nav class="social" aria-label="Social">
+    <a href="https://discord.gg/yNzFWsM7uf" target="_blank" rel="noopener" aria-label="Discord" title="Discord">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.2.5a18 18 0 0 1 4.5 2.3 18.6 18.6 0 0 0-15.4 0A18 18 0 0 1 8.8 3.5L8.6 3a19.7 19.7 0 0 0-4.9 1.5C.6 9.1-.3 13.6.2 18.1A19.9 19.9 0 0 0 6.2 21l1-1.7a12.8 12.8 0 0 1-2-1c.2-.1.4-.3.6-.4a14.2 14.2 0 0 0 12.4 0l.6.4a12.8 12.8 0 0 1-2 1l1 1.7a19.8 19.8 0 0 0 6-2.9c.6-5.2-.9-9.7-3.5-13.7zM8.7 15.1c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2zm6.6 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2z"/></svg>
+    </a>
+    <a href="https://www.youtube.com/@warp-projects" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 7.2s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.3-1C16.6 3.5 12 3.5 12 3.5s-4.6 0-7.8.4c-.4.1-1.4.1-2.3 1-.7.7-.9 2.3-.9 2.3S.8 9.1.8 11v1.8c0 1.9.2 3.8.2 3.8s.2 1.6.9 2.3c.9.9 2 .9 2.5 1 1.8.2 7.6.4 7.6.4s4.6 0 7.8-.4c.4-.1 1.4-.1 2.3-1 .7-.7.9-2.3.9-2.3s.2-1.9.2-3.8V11c0-1.9-.2-3.8-.2-3.8zM9.8 15.1V8.4l6.2 3.4-6.2 3.3z"/></svg>
+    </a>
+  </nav>
+
+  <script src="./app.js"></script>
+</body>
+</html>
